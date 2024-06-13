@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const Drprofile = (props) => {
  
      const[dctrname, setDctrname]=useState();
@@ -23,9 +23,9 @@ const Drprofile = (props) => {
 
       <View style={styles.profile}> 
       
-      <TouchableHighlight onPress={()=> props.navigation.navigate("drprofile")}>
+      <TouchableOpacity onPress={()=> props.navigation.navigate("drprofile")}>
       <Image style={styles.imge}/>
-    </TouchableHighlight>
+    </TouchableOpacity>
       
     <View style={styles.drinfo}>
     
@@ -36,15 +36,15 @@ const Drprofile = (props) => {
 
        <Text style={styles.titl}> {dctrname.email}</Text>
      <View style={styles.eyes}>
-       <TouchableHighlight onPress={()=> props.navigation.navigate("profile")} style={styles.viewprof} >
+       <TouchableOpacity onPress={()=> props.navigation.navigate("profile")} style={styles.viewprof} >
            
          <Text style={styles.btnn}>View Profile </Text>
          
-    </TouchableHighlight>
+    </TouchableOpacity>
 
-    <TouchableHighlight onPress={()=> props.navigation.navigate("profile")}>
+    <TouchableOpacity onPress={()=> props.navigation.navigate("profile")}>
           <Image source={require('../assets/drprofile/eyes.png')} style={styles.eye}/>  
-    </TouchableHighlight>
+    </TouchableOpacity>
 
     </View>
       
@@ -54,72 +54,72 @@ const Drprofile = (props) => {
 
      <View style={styles.setting}>
         <View style={styles.acc}>
-            <TouchableHighlight> 
+            <TouchableOpacity> 
             <Image source={require('../assets/drprofile/user.png')}/>
-            </TouchableHighlight>
-            <TouchableHighlight>
+            </TouchableOpacity>
+            <TouchableOpacity>
             <Text style={styles.tit}>Account Settings</Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
 
         <View style={styles.acc}>
-            <TouchableHighlight> 
+            <TouchableOpacity> 
             <Image source={require('../assets/drprofile/privacy.png')}/>
-            </TouchableHighlight>
-            <TouchableHighlight>
+            </TouchableOpacity>
+            <TouchableOpacity>
             <Text style={styles.tit}>Account Privacy</Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
 
 
         <View style={styles.acc}>
-            <TouchableHighlight> 
+            <TouchableOpacity> 
             <Image source={require('../assets/drprofile/policy.png')}/>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={()=> props.navigation.navigate("terms")}>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=> props.navigation.navigate("terms")}>
             <Text style={styles.tit}>Privacy & Policy </Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
 
 
         <View style={styles.acc}>
-            <TouchableHighlight> 
+            <TouchableOpacity> 
             <Image source={require('../assets/drprofile/help.png')}/>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={()=> props.navigation.navigate("helpsupport")}>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=> props.navigation.navigate("helpsupport")}>
             <Text style={styles.tit}>Help & Support </Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
 
         
         <View style={styles.acc}>
-            <TouchableHighlight> 
+            <TouchableOpacity> 
             <Image source={require('../assets/drprofile/share.png')}/>
-            </TouchableHighlight>
-            <TouchableHighlight>
+            </TouchableOpacity>
+            <TouchableOpacity>
             <Text style={styles.tit}> Share App </Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
 
         
         <View style={styles.acc}>
-            <TouchableHighlight> 
+            <TouchableOpacity> 
             <Image source={require('../assets/drprofile/rating.png')}/>
-            </TouchableHighlight>
-            <TouchableHighlight>
+            </TouchableOpacity>
+            <TouchableOpacity>
             <Text style={styles.tit}> Rating Us </Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
 
 
         
         <View style={styles.logout}>
-            <TouchableHighlight> 
+            <TouchableOpacity> 
             <Image source={require('../assets/drprofile/logout.png')}/>
-            </TouchableHighlight>
-            <TouchableHighlight>
+            </TouchableOpacity>
+            <TouchableOpacity>
             <Text style={styles.logclr}>Log out  </Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
      </View>
 

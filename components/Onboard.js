@@ -3,7 +3,7 @@ import {
   Image,
   StyleSheet,
   Text,
-  TouchableHighlight,
+  TouchableOpacity,
   View
 } from "react-native";
 
@@ -23,9 +23,9 @@ import {
       source={require('../assets/cover.png')}
      />
 
-   <TouchableHighlight onPress={()=> props.navigation.navigate("create")}> 
+   <TouchableOpacity onPress={()=> props.navigation.navigate("create")}> 
       <Text style={styles.buton}>Get Started </Text>
-   </TouchableHighlight>
+   </TouchableOpacity>
 </View>
 
     </View>

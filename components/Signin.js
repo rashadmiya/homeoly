@@ -1,11 +1,18 @@
+import { Image } from "@rneui/base";
 import React, { useState } from "react";
 import {
   StyleSheet,
   Text, TextInput,
-  TouchableHighlight,
-  View
+  TouchableOpacity,
+  View,
+  Dimensions
 } from "react-native";
-import Icon from 'react-native-vector-icons/AntDesign';
+import { apiService } from "../src/services/api-service";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const USER_ID = '@user_id';
+export const USER_TOKEN = '@user_token';
+const dimension = Dimensions.get('screen');
 
 const Signin = ({ navigation, props }) => {
   const [email, setEmail] = useState('');
@@ -14,14 +21,18 @@ const Signin = ({ navigation, props }) => {
 
   const handleSignIn = async () => {
     try {
-      // const response = await axios.post('http://localhost:5000/api/users/signin', {
-      //   email,
-      //   password,
-      // });
-      // const token = response.data.token;
-      // Save the token and navigate to the main app screen
-      //  AsyncStorage.setItem('token', token);
-      navigation.navigate('dashboard');
+
+      await apiService.signin({ email: email, password: password }).then(async(res) => {
+        try {
+          await AsyncStorage.setItem(USER_ID, res.data.id);
+          await AsyncStorage.setItem(USER_TOKEN, res.data.token);
+
+          navigation.navigate('dashboard');
+        } catch (error) {
+          Alert.alert('Error', 'Failed to save user data.');
+        }
+      }).catch(err => console.log(err));
+
     } catch (err) {
       // setError('Invalid email or password');
     }
@@ -31,54 +42,67 @@ const Signin = ({ navigation, props }) => {
   return (
     <>
 
-      <View style={stylec.main}>
+      <View style={styles.main}>
 
-        <Text style={stylec.create}>Welcome Back! </Text>
+        <Text style={styles.welcome}>Welcome Back! </Text>
 
-        <TextInput
-          placeholder="Email or Phone"
-          value={email}
-          onChangeText={setEmail}
-          style={stylec.input1}
-          keyboardType="email-address"
-        />
+        <View style={{ width: '100%', flexDirection: 'column', justifyContent: 'center', }}>
+          <TextInput
+            placeholder="Email or Phone"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input1}
+            keyboardType="email-address"
+          />
 
-        <TextInput
-          placeholder="Password"
-          style={stylec.input1}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={true}
+          <TextInput
+            placeholder="Password"
+            style={styles.input1}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
 
-        />
+          />
 
-        <View style={stylec.remtxt}>
-          <Text>Remember me </Text>
-          <TouchableHighlight  >
-            <Text style={stylec.forgotxt}> Forgot password?  </Text>
-          </TouchableHighlight>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text>Remember me</Text>
+            <TouchableOpacity  >
+              <Text style={{ color: '#AFD59F' }}>Forgot password?</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.cont}>Or Continue with</Text>
         </View>
 
-        <Text style={stylec.cont}>Or Continue with</Text>
+        <View style={{ paddingHorizontal: '20%', marginTop: 10 }}>
+          <View style={styles.social}>
+            <View style={styles.rect}>
+              <Image source={require('../assets/social/google.png')} style={{ height: '100%', width: '100%' }} />
+            </View>
+            <View style={styles.rect}>
+              <Image source={require('../assets/social/facebook.png')} style={{ height: '100%', width: '100%' }} />
 
-        <View style={stylec.social}>
-          <View style={stylec.rect}>
-            <Icon name="google" size={30} color="red" />
+            </View>
+            <View style={styles.rect}>
+              <Image source={require('../assets/social/apple.png')} style={{ height: '100%', width: '100%' }} />
+            </View>
           </View>
-          <View style={stylec.rect}></View>
-          <View style={stylec.rect}></View>
         </View>
         {/* {error ? <Text>{error}</Text> : null} */}
 
-        <TouchableHighlight onPress={handleSignIn} >
-          <Text style={stylec.buton}> Sign In </Text>
-        </TouchableHighlight>
+        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          <TouchableOpacity style={styles.buton} onPress={handleSignIn} >
+            <Text style={[styles.txt, { color: '#fff' }]}>Sign In </Text>
+          </TouchableOpacity>
+        </View>
 
-        <View style={stylec.lstext}>
-          <Text style={stylec.txt}>Do you have an account ?</Text>
-          <TouchableHighlight onPress={() => props.navigation.navigate("create")}>
-            <Text style={stylec.sign}>Create account </Text>
-          </TouchableHighlight>
+        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          <Text style={styles.txt}>Do you have an account ?</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("create")}
+          >
+            <Text style={styles.sign}>Create account </Text>
+          </TouchableOpacity>
         </View>
 
       </View>
@@ -91,20 +115,15 @@ const Signin = ({ navigation, props }) => {
 
 };
 
-const stylec = StyleSheet.create({
+const styles = StyleSheet.create({
   main: {
     backgroundColor: 'white',
     width: "100%",
     height: '100%',
-    overflow: "hidden",
-    paddingHorizontal: 'auto'
+    paddingHorizontal: 15
   },
-  create: {
-    width: 208,
-    height: 31,
-    top: 44,
-    left: 82,
-
+  welcome: {
+    marginVertical: 100,
     fontFamily: 'poppins',
     fontSize: 24,
     fontWeight: '600',
@@ -112,18 +131,11 @@ const stylec = StyleSheet.create({
     lineHeight: 31,
     letterSpacing: 0.05,
     textAlign: 'center',
-
-
-
   },
 
   input1: {
-
-    width: 322,
     height: 52,
-    top: '13%',
-    left: 13,
-    margin: 7,
+    marginTop: 7,
     fontFamily: 'Poppins',
     fontSize: 14,
     fontWeight: '400',
@@ -132,29 +144,22 @@ const stylec = StyleSheet.create({
     textAlign: 'left',
     borderWidth: 1,
     borderColor: '#AFD59F',
-
     borderRadius: 6,
 
   },
   cont: {
-    width: 128,
-    height: 21,
-    left: 135,
-    top: 90,
-
+    marginTop: 50,
     fontFamily: 'Poppins',
     fontSize: 14,
     fontWeight: '400',
     lineHeight: 21,
     letterSpacing: 0.05,
-    textAlign: 'left',
+    textAlign: 'center',
 
   },
 
   social: {
     flexDirection: 'row',
-    top: 10,
-    left: 30,
   },
 
   rect: {
@@ -164,8 +169,6 @@ const stylec = StyleSheet.create({
     borderWidth: 0.6,
     backgroundColor: 'none',
     borderColor: '#9DA296',
-    top: '24%',
-    left: 33,
     margin: 13,
   },
 
@@ -174,26 +177,17 @@ const stylec = StyleSheet.create({
     width: 332,
     backgroundColor: '#4CAF50',
     borderRadius: 14,
-    left: 12,
-    top: 110,
     textAlign: 'center',
     fontSize: 18,
     color: '#fff',
     fontFamily: 'Poppins',
     lineHeight: 20.8,
-
     padding: 12,
+    marginTop: 20
 
   },
 
-
-  lstext: {
-    flexDirection: 'row',
-    top: '36%',
-    left: 70,
-  },
   txt: {
-
     fontFamily: 'Poppins',
     fontSize: 14,
     fontWeight: '400',
@@ -202,19 +196,6 @@ const stylec = StyleSheet.create({
     textAlign: 'center',
 
   },
-  sign: {
-    color: '#AFD59F',
-  },
-  remtxt: {
-    flexDirection: 'row',
-    top: 75,
-    left: 20,
-  },
-  forgotxt: {
-    left: 110,
-    color: '#AFD59F',
-  }
-
 
 });
 

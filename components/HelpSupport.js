@@ -1,94 +1,92 @@
-import { StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 const HelpSupport = (props) => {
 
-     return (
-      <>
-     
-      <View style={styles.main}> 
-     
-     
-<View > 
-  <Text style={styles.bill}>Help & Support </Text>
-</View>
+  return (
+    <>
 
-      <View style={styles.editable}>
+      <View style={styles.main}>
+        <View >
+          <Text style={styles.bill}>Help & Support </Text>
+        </View>
 
-        <View>
+        <View style={styles.editable}>
+
+          <View>
             <Text style={styles.name}>Full Name  </Text>
-        
+
             <TextInput
- placeholder="Email or Phone" 
- style={styles.input1}
- />
+              placeholder="Email or Phone"
+              style={styles.input1}
+            />
 
-    </View>
-
-
-   
-
-
-
-   
+          </View>
 
 
 
 
-   
 
-    <View>
+
+
+
+
+
+
+
+
+          <View>
             <Text style={styles.name}>Email  </Text>
-        
+
             <TextInput
 
- style={styles.input1}
- />
+              style={styles.input1}
+            />
 
-    </View>
-  
-
+          </View>
 
 
-    <View>
+
+
+          <View>
             <Text style={styles.name}>Phone number  </Text>
-        
+
             <TextInput
 
- style={styles.input1}
- />
+              style={styles.input1}
+            />
 
-    </View>
-
-   
+          </View>
 
 
-    <View>
+
+
+          <View>
             <Text style={styles.name}>Message </Text>
-        
+
             <TextInput
 
- style={styles.input2}
- />
+              style={styles.input2}
+            />
 
-    </View>
+          </View>
 
-   <View> 
-   <TouchableHighlight >
-    <Text style={styles.buton}>Send Message</Text>
-   </TouchableHighlight>
-   </View>
+          <View>
+            <TouchableOpacity >
+              <Text style={styles.buton}>Send Message</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+
+
+
+
+
+
       </View>
 
+    </>
 
-
-
-
-
-
-      </View>
-     
-      </>
-
-     );
+  );
 
 
 
@@ -97,32 +95,32 @@ const HelpSupport = (props) => {
 
 const styles = StyleSheet.create({
 
-    main:{
-        backgroundColor: 'white',
-        flex: 1,
-        width: "100%",
-        height: 1250,
-        overflow: "hidden",
-    },
-    
-   bill:{
+  main: {
+    backgroundColor: 'white',
+    flex: 1,
+    width: "100%",
+    height: 1250,
+    overflow: "hidden",
+  },
+
+  bill: {
     fontFamily: 'Poppins',
     fontSize: 18,
     fontWeight: '700',
     top: 10,
-    left:20,
+    left: 20,
     color: '#192608',
   },
 
-   name:{
-     fontSize: 14, 
-     fontWeight: '500',
-     top: 20,
-     left: 20,
-     color: '#868D7E',
-   },
-   input1:{
-    
+  name: {
+    fontSize: 14,
+    fontWeight: '500',
+    top: 20,
+    left: 20,
+    color: '#868D7E',
+  },
+  input1: {
+
     width: 322,
     height: 52,
     top: '25%',
@@ -134,48 +132,48 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     letterSpacing: 0,
     textAlign: 'left',
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: '#AFD59F',
-    borderRadius: 6, 
-    
-      },
+    borderRadius: 6,
 
-      input2:{
-    
-        width: 322,
-        height: 72,
-        top: '25%',
-        left: 10,
-        margin: 7,
-        fontFamily: 'Poppins',
-        fontSize: 14,
-        fontWeight: '400',
-        lineHeight: 26,
-        letterSpacing: 0,
-        textAlign: 'left',
-        borderWidth: 1, 
-        borderColor: '#AFD59F',
-        borderRadius: 6, 
-        
-          },
-     
+  },
 
-    buton: {
-      height: 52, 
-      width:332, 
-      backgroundColor: '#4CAF50',
-      borderRadius: 14, 
-      left: 12,
-      top: 50,
-      textAlign: 'center', 
-      fontSize: 18, 
-      color: '#fff',
-      fontFamily: 'Poppins',
-      lineHeight: 20.8, 
-     
-     padding:12, 
-     
-   },
+  input2: {
+
+    width: 322,
+    height: 72,
+    top: '25%',
+    left: 10,
+    margin: 7,
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 26,
+    letterSpacing: 0,
+    textAlign: 'left',
+    borderWidth: 1,
+    borderColor: '#AFD59F',
+    borderRadius: 6,
+
+  },
+
+
+  buton: {
+    height: 52,
+    width: 332,
+    backgroundColor: '#4CAF50',
+    borderRadius: 14,
+    left: 12,
+    top: 50,
+    textAlign: 'center',
+    fontSize: 18,
+    color: '#fff',
+    fontFamily: 'Poppins',
+    lineHeight: 20.8,
+
+    padding: 12,
+
+  },
 
 });
 export default HelpSupport; 

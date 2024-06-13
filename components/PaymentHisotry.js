@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, Modal, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const PaymentHisotry =()=> {
     const [visible, setVisible]= useState(false); 
@@ -33,9 +33,9 @@ const PaymentHisotry =()=> {
 
 
  <View>
-        <TouchableHighlight onPress={()=>setVisible(true)}>
+        <TouchableOpacity onPress={()=>setVisible(true)}>
         <Image source={require('../assets/draft/dot.png')} style={styles.img}/>
-        </TouchableHighlight>
+        </TouchableOpacity>
         <Modal transparent visible={visible} animationType='fade'>
              {/* <SafeAreaView style={styles.modal} onTouchStart={()=> setVisible(false)}> */}
              <View style={styles.modal} >

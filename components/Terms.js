@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, ScrollView, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const Terms = (props)=>{
 
@@ -80,33 +80,33 @@ If you make a request, we have one month to respond to you. If you would like to
 
 <View style={styles.btmnav}>
      <View>
-      <TouchableHighlight onPress={()=> props.navigation.navigate("dashboard")}>
+      <TouchableOpacity onPress={()=> props.navigation.navigate("dashboard")}>
         <Image source={require('../assets/finance/home.png')} style={styles.btnavbar}/> 
-        </TouchableHighlight>
+        </TouchableOpacity>
      </View>
 
      <View>
-     <TouchableHighlight>
+     <TouchableOpacity>
         <Image source={require('../assets/dashboard/patient.png')} style={styles.btnavbar}/> 
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
 
       <View>
-      <TouchableHighlight>
+      <TouchableOpacity>
         <Image source={require('../assets/dashboard/addicon.png')} style={{top: -16, left: 10,}}/> 
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
 
       <View>
-      <TouchableHighlight>
+      <TouchableOpacity>
         <Image source={require('../assets/dashboard/finance.png')} style={styles.btnavbar}/> 
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
 
       <View>
-      <TouchableHighlight>
+      <TouchableOpacity>
         <Image source={require('../assets/dashboard/profile.png')} style={styles.btnavbar}/> 
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
 
   </View>

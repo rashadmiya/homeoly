@@ -27,6 +27,8 @@ import Profile from './components/Profile';
 import Signin from "./components/Signin";
 import Terms from './components/Terms';
 import Verfication from "./components/Verfications";
+import Patient from './components/Patient';
+import AddFinence from './components/AddFinence';
 const stack = createNativeStackNavigator();
  
 function App() {
@@ -52,6 +54,8 @@ function App() {
      <stack.Screen name='editpatient' component={Editpatient}/>
      <stack.Screen name='helpsupport' component={HelpSupport}/>
      <stack.Screen name='terms' component={Terms}/>
+     <stack.Screen name='patient' component={Patient}/>
+     <stack.Screen name='addfinance' component={AddFinence}/>
     </stack.Navigator>
    </NavigationContainer>
 
