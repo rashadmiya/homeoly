@@ -3,22 +3,39 @@ import { useNavigation } from '@react-navigation/native';
 import { FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { apiService } from '../src/services/api-service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { USER_ID } from './Signin';
-const Finance = (props) => {
+import { USER_ID, USER_TOKEN } from './Signin';
 
+
+const Finance = (props) => {
+  const [allPatient, setAllPatient] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   const [visible, setVisible] = useState(false);
   const navigation = useNavigation();
   const [bills, setBills] = useState([])
 
   useEffect(() => {
-    console.log('Bills useEffect');
-    const userId = AsyncStorage.getItem(USER_ID);
-    apiService.getAllBill({ userId }).then((res) => {
-      console.log("Finance: ", res.data.data);
-      setBills(res?.data?.data || [])
-    }).catch(err => console.log(err))
+    // const userId = AsyncStorage.getItem(USER_ID);
+    // apiService.getAllBill({ userId }).then((res) => {
+    //   console.log("Finance: ", res.data.data);
+    //   setBills(res?.data?.data || [])
+    // }).catch(err => console.log(err))
+    loadPatient();
   }, [])
 
+
+  const loadPatient = async () => {
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+
+    await apiService.getAllPatient(token).then((res) => {
+      const data = res.data.patients.map(item => { return { id: item._id, ...item } });
+      console.log("token at finance", data)
+      setAllPatient(data);
+      setLoading(false)
+    }).catch((err) => {
+      setLoading(false);
+      console.log("patient dashboard data loading :", err);
+    });
+  }
 
   const billedItem = (data) => {
     const { item } = data;
@@ -26,7 +43,7 @@ const Finance = (props) => {
     return (
       <Pressable style={styles.item} onPress={() => navigation.navigate('patient', { item })} >
         <View style={{flexDirection:'row', justifyContent:'space-around', paddingVertical:10}}>
-            <Text style={styles.name}>name</Text>
+            <Text style={styles.name}>{item.fullName}</Text>
             <Text style={styles.name}>{item?.totalBill}</Text>
             <Text style={styles.name}>{item?.receivedBill}</Text>
             <Text style={styles.name}>{item?.DueBill}</Text>
@@ -51,7 +68,7 @@ const Finance = (props) => {
             <View style={styles.overvieww1}>
               <Image source={require('../assets/dashboard/dollar.png')} style={styles.bill1} />
               <Text style={styles.num1}>0</Text>
-              <Text style={styles.billtxt}>  Todays Earning </Text>
+              <Text style={styles.billtxt}>Todays Earning </Text>
             </View>
 
             <View style={styles.overvieww2}>
@@ -89,7 +106,7 @@ const Finance = (props) => {
 
         <FlatList
           style={{ flex: 1 }}
-          data={bills}
+          data={allPatient}
           renderItem={billedItem}
           keyExtractor={(item, index) => index.toString()}
           ItemSeparatorComponent={() => <View style={styles.separator} />}

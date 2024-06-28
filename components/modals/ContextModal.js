@@ -3,7 +3,7 @@ import { View, Text, Modal, TouchableOpacity, StyleSheet, Dimensions, Image } fr
 import { apiService } from '../../src/services/api-service';
 import { useNavigation } from '@react-navigation/native';
 
-const ContextModal = ({ item }) => {
+const ContextModal = ({ item, deletePatientHandler }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
     const navigation = useNavigation();
@@ -33,7 +33,7 @@ const ContextModal = ({ item }) => {
                     <View style={[styles.modalView, { top: buttonPosition.y, left: buttonPosition.x - 150 }]}>
                         <TouchableOpacity onPress={() => {
                             hideModal();
-                            navigation.navigate('editpatient', {item})
+                            navigation.navigate('editpatient', { item })
 
                         }}>
                             <View style={styles.flex_row}>
@@ -44,11 +44,14 @@ const ContextModal = ({ item }) => {
 
                         <View style={styles.separator}></View>
                         <TouchableOpacity
-                            onPress={async() => {
-                                console.log('Item Data', item,item.id);
-                                await apiService.deletePatient(item.id).then(()=>{
-                                    hideModal();
-                                }).catch(err=> console.log(err))
+                            onPress={async () => {
+                                // console.log('Item Data (_id)',item._id);
+                                // await apiService.deletePatient(item.id).then(() => {
+                                //     hideModal();
+                                //     navigation.navigate('patientdashboard', { for: 'delete' });
+                                // }).catch(err => console.log(err))
+                                deletePatientHandler(item._id)
+
                             }}
                         >
                             <View style={styles.flex_row}>

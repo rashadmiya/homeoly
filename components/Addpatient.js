@@ -3,9 +3,10 @@ import axios from 'axios';
 import React, { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
 import { apiService } from '../src/services/api-service';
-import { USER_ID } from './Signin';
+import { USER_ID, USER_TOKEN } from './Signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { useNavigation } from '@react-navigation/native';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 
 
@@ -34,10 +35,10 @@ const Addpatient = (props) => {
   const [permanentCity, setPermanentCity] = useState('');
   const [permanentApertment, setPermanentApertment] = useState('');
 
-
+  const navigation = useNavigation();
   const handleAddpatient = async () => {
 
-    const userId = await AsyncStorage.getItem(USER_ID);
+    const tokenId = await AsyncStorage.getItem(USER_TOKEN);
 
     if (!name || !day
       || !month || !year || !gender || !religion || !phone || !email
@@ -48,9 +49,9 @@ const Addpatient = (props) => {
     }
 
     const data = {
-      userId: userId,
-      doctorId: userId,
-      image: "image_url",
+      // userId: userId,
+      // doctorId: userId,
+      image: profilePicture,
       fullName: name,
       email: email,
       phone: phone,
@@ -59,7 +60,7 @@ const Addpatient = (props) => {
       religion: religion,
       presentAddress: {
         address: preadress,
-        country: "bd",
+        country: "BD",
         state: prestate,
         city: precity,
         zip: "",
@@ -67,7 +68,7 @@ const Addpatient = (props) => {
       },
       permanentAddress: {
         address: permanentAddress,
-        country: "bd",
+        country: permanentCountry ? permanentCountry : "BD",
         state: permanentState,
         city: permanentCity,
         zip: permanentZip,
@@ -75,48 +76,48 @@ const Addpatient = (props) => {
       }
     }
 
-    console.log("patient data :", data)
     try {
-      await apiService.addPatient(data).then((res) => {
+      await apiService.addPatient(data, tokenId).then((res) => {
         console.log("add patient response ::::", res.data)
-        navigation.navigate('profile');
-      }).catch(err=>console.log(err))
+        navigation.navigate('patientdashboard');
+      }).catch(err => console.log("error occur while adding patient:", err.response.data))
     } catch (err) {
-      console.log(err);
-      setError('Error adding doctor, please try again');
+      console.log("Error adding patient, please try again", err);
+      setError('Error adding patient, please try again');
     }
   };
 
 
   const pickImage = () => {
-    // const options = {
-    //   mediaType: 'photo',
-    //   maxWidth: 300,
-    //   maxHeight: 300,
-    //   quality: 1,
-    // };
+    const options = {
+      mediaType: 'photo',
+      maxWidth: 300,
+      maxHeight: 300,
+      quality: 1,
+    };
 
-    // launchImageLibrary(options, (response) => {
-    //   if (response.didCancel) {
-    //     console.log('User cancelled image picker');
-    //   } else if (response.error) {
-    //     console.log('ImagePicker Error: ', response.error);
-    //   } else if (response.customButton) {
-    //     console.log('User tapped custom button: ', response.customButton);
-    //   } else {
-    //     const source = { uri: response.assets[0].uri };
-    //     console.log("image :",source)
-    //     setImageUri(source.uri);
-    //     setProfilePicture(result.uri);
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        const source = { uri: response.assets[0].uri };
+        console.log("image :", source)
+        // setImageUri(source.uri);
+        setProfilePicture(source.uri);
 
-    //   }
-    // });
+      }
+    });
   }
 
 
   const togglePermanentAddress = () => {
     setChecked(!checked);
     if (checked) {
+      setPermanentCountry("BD")
       setPermanentAddress(preadress);
       setPermanentCity(precity);
       setPermanentState(prestate);
@@ -137,16 +138,16 @@ const Addpatient = (props) => {
         <View style={styles.main}>
           <TouchableOpacity onPress={pickImage}>
             <View style={styles.profile}>
-              <Image source={require('../assets/social/patient.jpeg')} style={styles.imge} />
 
-              <TouchableOpacity onPress={() => pickImage()}>
-                <Image source={require('../assets/editprofile/camera.png')} style={styles.icon} />
-              </TouchableOpacity>
+              {profilePicture ? (
+                <Image source={{ uri: profilePicture }} style={styles.imge} />
+              ) : (
+                <View style={styles.imge} />
+              )}
+              <Image source={require('../assets/editprofile/camera.png')} style={styles.icon} />
+
             </View>
           </TouchableOpacity>
-          {profilePicture && (
-            <Image source={{ uri: profilePicture }} style={styles.image} />
-          )}
 
           <View style={styles.editable}>
 

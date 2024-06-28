@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { apiService } from '../src/services/api-service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { USER_TOKEN } from './Signin';
 
 const Editpatient = ({ route, navigation }) => {
   const [profilePicture, setProfilePicture] = useState('');
@@ -35,7 +36,7 @@ const Editpatient = ({ route, navigation }) => {
 
   const handleAddpatient = async () => {
 
-    // const userId = await AsyncStorage.getItem(USER_ID);
+    const token = await AsyncStorage.getItem(USER_TOKEN);
     console.log('name----', name);
     if (!name || !day
       || !month || !year || !gender || !religion || !phone || !email
@@ -72,8 +73,8 @@ const Editpatient = ({ route, navigation }) => {
 
     console.log("patient data :", data, item.id)
     try {
-      await apiService.updatePatient(data, item.id).then((res) => {
-        console.log("add patient response ::::", res.data)
+      await apiService.updatePatient(data, item.id, token).then((res) => {
+        console.log("update patient response ::::", res.data)
         navigation.navigate('patientdashboard');
       }).catch(err=> console.log('Catch:',err))
     } catch (err) {
@@ -83,27 +84,27 @@ const Editpatient = ({ route, navigation }) => {
   };
 
   const pickImage = () => {
-    // const options = {
-    //   mediaType: 'photo',
-    //   maxWidth: 300,
-    //   maxHeight: 300,
-    //   quality: 1,
-    // };
+    const options = {
+      mediaType: 'photo',
+      maxWidth: 300,
+      maxHeight: 300,
+      quality: 1,
+    };
 
-    // launchImageLibrary(options, (response) => {
-    //   if (response.didCancel) {
-    //     console.log('User cancelled image picker');
-    //   } else if (response.error) {
-    //     console.log('ImagePicker Error: ', response.error);
-    //   } else if (response.customButton) {
-    //     console.log('User tapped custom button: ', response.customButton);
-    //   } else {
-    //     const source = { uri: response.assets[0].uri };
-    //     setImageUri(source.uri);
-    //     setProfilePicture(result.uri);
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        const source = { uri: response.assets[0].uri };
+        // setImageUri(source.uri);
+        setProfilePicture(source.uri);
 
-    //   }
-    // });
+      }
+    });
   }
 
 
@@ -112,13 +113,18 @@ const Editpatient = ({ route, navigation }) => {
       <ScrollView>
         <View style={styles.main}>
 
-          <View style={styles.profile}>
-            <Image style={styles.imge} />
-            <TouchableOpacity onPress={() => pickImage()}>
-              <Image source={require('../assets/editprofile/camera.png')} style={styles.icon} />
-            </TouchableOpacity>
+        <TouchableOpacity onPress={pickImage}>
+            <View style={styles.profile}>
 
-          </View>
+              {profilePicture ? (
+                <Image source={{ uri: profilePicture }} style={styles.imge} />
+              ) : (
+                <View style={styles.imge} />
+              )}
+              <Image source={require('../assets/editprofile/camera.png')} style={styles.icon} />
+
+            </View>
+          </TouchableOpacity>
 
           <View style={styles.editable}>
 

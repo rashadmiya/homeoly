@@ -81,7 +81,4 @@ const draftDoc = [
     }
   ];
   
-  console.log(draftDoc);
-  
-
   export default draftDoc;

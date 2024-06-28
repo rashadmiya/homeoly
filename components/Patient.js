@@ -1,11 +1,13 @@
 
 
 
-import React from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
-import PatientModal from './modals/PatientModal';
-import PrescriptionModal from './modals/PrescriptionModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect } from 'react';
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { apiService } from '../src/services/api-service';
 import CreatePrescriptionModal from './modals/CreatePrescriptionModal';
+import PrescriptionItem from './PrescriptionItem';
+import { USER_TOKEN } from './Signin';
 
 
 const Patient = ({ route, navigation }) => {
@@ -14,38 +16,65 @@ const Patient = ({ route, navigation }) => {
      const [modalVisible, setModalVisible] = React.useState(false);
      const [selectedItem, setSelectedItem] = React.useState(null);
      const [createPrescriptionModalVisible, setCreatePrescriptionModalVisible] = React.useState(false);
+     const [patientPrescriptions, setPatientPrescriptions] = React.useState([]);
 
-     const closeModal = () => {
-          setSelectedOption('');
-          setModalVisible(false);
-     };
+     // console.log("item at patient:", item);
+
+     useEffect(() => {
+          loadPrescriptions(item._id)
+     }, [])
+
 
      const closeCreatePrescriptionModal = () => {
           setCreatePrescriptionModalVisible(false);
      };
 
-     const handleOption = (item) => {
-          setSelectedItem(item);
-          setModalVisible(!modalVisible);
-     };
 
-     const confirmDelete = () => {
-          // Perform deletion logic here
-          setModalVisible(false);
-          console.log(`Deleting item: ${selectedItem.name}`);
-     };
+
+     const submitPrescription = async (data) => {
+          const userToken = await AsyncStorage.getItem(USER_TOKEN);
+
+          const updateData = {
+               ...data,
+               patientId: item._id,
+          }
+
+          try {
+               await apiService.addPrescription(updateData, userToken).then((res) => {
+                    console.log("add prescription response ::::", res.data)
+                    //   navigation.navigate('patientdashboard');
+               }).catch(err => console.log("error occur while adding presscription:", err.response.data))
+          } catch (err) {
+               console.log('Error adding prescription, please try again', err);
+               // setError('Error adding prescription, please try again');
+          }
+
+     }
+
+     const loadPrescriptions = async (patientId) => {
+          const userToken = await AsyncStorage.getItem(USER_TOKEN);
+          apiService.getPatientPrescription(patientId, userToken)
+               .then((res) => {
+                    console.log("patinet prescription :", res.data)
+                    setPatientPrescriptions(res.data);
+               }).catch((err) => {
+                    console.log("error while getting patient prescription", err)
+               })
+     }
+
 
      return (
           <View style={{ flex: 1 }}>
                <View style={styles.item} >
-                    <Image source={{ uri: item.avatarUrl }} style={styles.avatar} />
+                    <Image source={{ uri: item.image }} style={styles.avatar} />
                     <View style={styles.infoContainer}>
                          <View style={styles.details}>
-                              <Text style={styles.name}>{`${item.name} (${item.experience})`}</Text>
+                              <Text style={styles.name}>{`${item.fullName} (${item.dateOfBirth})`}</Text>
                          </View>
-                         <Text>{item.location}</Text>
 
-                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                         <Text style={{ marginVertical: 10 }}>{`${item.presentAddress.apartment}, ${item.presentAddress.state}, ${item.presentAddress.city}, ${item.presentAddress.country}`}</Text>
+
+                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                               <View style={{ backgroundColor: '#E3FFEF', padding: 10, borderWidth: 1, borderColor: '#ccc' }}>
                                    <Text>Text/call</Text>
                               </View>
@@ -68,52 +97,23 @@ const Patient = ({ route, navigation }) => {
                          <View style={[styles.separator, { marginTop: 5 }]} />
                     </View>
                </View>
-
-               <View style={[styles.px15,]}>
-                    <View style={[styles.bgWhite]}>
-                         <View style={styles.dateTime}>
-                              <Text style={styles.dateTimeText}>{item.date}</Text>
-                              <Text style={styles.dateTimeText}>{item.time}</Text>
-                         </View>
-
-                         <View style={[styles.justifyBetween, styles.mt10, { padding: 5 }]}>
-                              <Text style={[styles.dateTimeText, { flex: 1, }]}>Rush Tox 200 + 2 bottle + 2 Span, K.P 30x 6 Tab. 2 Times a day</Text>
-                              <PrescriptionModal />
-                         </View>
-                    </View>
-                    <View style={[styles.separator, { marginTop: 5 }]} />
-               </View>
+               {/* <FlatList
+                    style={{ flex: 1 }}
+                    data={patientPrescriptions}
+                    renderItem={PrescriptionItem}
+                    keyExtractor={(item, index) => index.toString()}
+                    ItemSeparatorComponent={() => <View style={styles.separator} />}
+                    ListFooterComponent={() => <View style={{ height: 100 }} />}
+               /> */}
 
 
-               <View style={[styles.px15,]}>
-                    <View style={[styles.bgWhite]}>
-                         <View style={styles.dateTime}>
-                              <Text style={styles.dateTimeText}>{item.date}</Text>
-                              <Text style={styles.dateTimeText}>{item.time}</Text>
-                         </View>
-
-                         <View style={[styles.justifyBetween, styles.mt10, { padding: 5 }]}>
-                              <Text style={[styles.dateTimeText, { flex: 1, }]}>Rush Tox 200 + 2 bottle + 2 Span, K.P 30x 6 Tab. 2 Times a day</Text>
-                              <PrescriptionModal />
-                         </View>
-                    </View>
-                    <View style={[styles.separator, { marginTop: 5 }]} />
-               </View>
-
-               <View style={[styles.px15,]}>
-                    <View style={[styles.bgWhite]}>
-                         <View style={styles.dateTime}>
-                              <Text style={styles.dateTimeText}>{item.date}</Text>
-                              <Text style={styles.dateTimeText}>{item.time}</Text>
-                         </View>
-
-                         <View style={[styles.justifyBetween, styles.mt10, { padding: 5 }]}>
-                              <Text style={[styles.dateTimeText, { flex: 1, }]}>Rush Tox 200 + 2 bottle + 2 Span, K.P 30x 6 Tab. 2 Times a day</Text>
-                              <PrescriptionModal />
-                         </View>
-                    </View>
-                    <View style={[styles.separator, { marginTop: 5 }]} />
-               </View>
+               <FlatList
+                    data={patientPrescriptions}
+                    renderItem={(elem) => <PrescriptionItem pres={elem.item} />}
+                    keyExtractor={(item, index) => index.toString()}
+                    ItemSeparatorComponent={() => <View style={styles.separator} />}
+                    ListFooterComponent={() => <View style={{ height: 100 }} />}
+               />
 
                <View style={{ position: 'absolute', bottom: 0, right: 0, flexDirection: 'row', justifyContent: 'flex-end', }}>
                     <TouchableOpacity style={{ backgroundColor: '#00A746', width: 60, height: 60, justifyContent: 'center', alignItems: 'center', borderRadius: 70 }}
@@ -127,7 +127,7 @@ const Patient = ({ route, navigation }) => {
                </View>
 
                <CreatePrescriptionModal closeModal={closeCreatePrescriptionModal}
-                    modalVisible={createPrescriptionModalVisible} />
+                    modalVisible={createPrescriptionModalVisible} submitPrescription={submitPrescription} />
 
           </View>
      )

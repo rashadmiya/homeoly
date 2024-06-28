@@ -1,14 +1,15 @@
 import { Image } from "@rneui/base";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text, TextInput,
   TouchableOpacity,
   View,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import { apiService } from "../src/services/api-service";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getData } from "../src/utils/localSgorage";
 
 export const USER_ID = '@user_id';
 export const USER_TOKEN = '@user_token';
@@ -18,23 +19,54 @@ const Signin = ({ navigation, props }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   // const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const getToken = async () => {
+      let tokn = await getData(USER_TOKEN);
+      console.log("token at useEffect :", tokn)
+      if (tokn) {
+        navigation.reset({
+          index: 0,
+          routes: [{
+            // @ts-ignore
+            name: 'dashboard'
+          }]
+        });
+      }
+    }
+    getToken();
+  }, []);
 
   const handleSignIn = async () => {
+    setLoading(true);
     try {
+      const formData = {
+        email: email,
+        password: password
+      }
 
-      await apiService.signin({ email: email, password: password }).then(async(res) => {
-        try {
-          await AsyncStorage.setItem(USER_ID, res.data.id);
-          await AsyncStorage.setItem(USER_TOKEN, res.data.token);
-
-          navigation.navigate('dashboard');
-        } catch (error) {
-          Alert.alert('Error', 'Failed to save user data.');
-        }
-      }).catch(err => console.log(err));
+      await apiService.signin(formData).then(async (res) => {
+        console.log("login success")
+        await AsyncStorage.setItem(USER_ID, res.data.data.id);
+        await AsyncStorage.setItem(USER_TOKEN, res.data.token);
+        setLoading(false)
+        navigation.reset({
+          index: 0,
+          routes: [{
+            // @ts-ignore
+            name: 'dashboard'
+          }]
+        });
+        
+      }).catch(err => {
+        setLoading(false);
+        console.log("error in login :", err)
+      });
 
     } catch (err) {
-      // setError('Invalid email or password');
+      setLoading(false);
+      console.log("error in login at try-catch:", err)
     }
   };
 
@@ -92,7 +124,8 @@ const Signin = ({ navigation, props }) => {
 
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
           <TouchableOpacity style={styles.buton} onPress={handleSignIn} >
-            <Text style={[styles.txt, { color: '#fff' }]}>Sign In </Text>
+            {loading?(<Text style={[styles.txt, { color: '#fff' }]}>Signing in...</Text>):
+            (<Text style={[styles.txt, { color: '#fff' }]}>Sign In</Text>)}
           </TouchableOpacity>
         </View>
 

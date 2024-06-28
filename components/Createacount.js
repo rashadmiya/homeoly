@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useState } from "react";
 import { StyleSheet, Text, TextInput, View, Image, TouchableOpacity } from 'react-native';
 import { apiService } from '../src/services/api-service';
+
 const Createacount = (props) => {
 
   const navigation = useNavigation();
@@ -14,6 +15,27 @@ const Createacount = (props) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  // const handleSignUp = async () => {
+  //   try {
+  //     const user = {
+  //       fullName: name,
+  //       email: email,
+  //       password: password,
+  //       phone: phone
+  //     }
+  //     console.log("user before create accont:",user)
+  //     await apiService.signup(user).then((res) => {
+  //       console.log("signup success",res)
+  //       navigation.navigate('verify', { email });
+  //     }).catch((err) => {
+  //       console.log("error while signing up (after then) :", err)
+  //     });
+  //   } catch (err) {
+  //     console.log("error while signing up :", err);
+  //   }
+  // };
+
+
   const handleSignUp = async () => {
     try {
       const user = {
@@ -22,16 +44,17 @@ const Createacount = (props) => {
         password: password,
         phone: phone
       }
-      await apiService.signup(user).then(()=>{
-        console.log("signup success")
+      console.log("user before create accont:",user)
+      await apiService.signup(user).then((res) => {
+        console.log("signup success",res)
         navigation.navigate('verify', { email });
-      }).catch(err=>console.log(err.message));
-      // navigation.navigate('verify', { email });
+      }).catch((err) => {
+        console.log("error while signing up (after then) :", err)
+      });
     } catch (err) {
-      setError('Error during sign up, please try again');
+      console.log("error while signing up :", err);
     }
   };
-
 
 
   return (

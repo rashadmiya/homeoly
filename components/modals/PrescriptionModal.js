@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
 
-const ContextModal = ({ handleOption }) => {
+const PrescriptionContextModal = ({ prescriptionId, handleOption }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
 
@@ -28,7 +28,7 @@ const ContextModal = ({ handleOption }) => {
             >
                 <TouchableOpacity style={styles.overlay} onPress={hideModal}>
                     <View style={[styles.modalView, { top: buttonPosition.y, left: buttonPosition.x - 150 }]}>
-                        
+
                         <TouchableOpacity onPress={() => {
                             hideModal();
 
@@ -40,7 +40,7 @@ const ContextModal = ({ handleOption }) => {
                         </TouchableOpacity>
 
                         <View style={styles.separator}></View>
-                        
+
                         <TouchableOpacity onPress={() => {
                             hideModal();
 
@@ -52,7 +52,7 @@ const ContextModal = ({ handleOption }) => {
                         </TouchableOpacity>
 
                         <View style={styles.separator}></View>
-                        
+
                         <TouchableOpacity onPress={() => {
                             hideModal();
 
@@ -67,7 +67,7 @@ const ContextModal = ({ handleOption }) => {
                         <TouchableOpacity
                             onPress={() => {
                                 hideModal();
-                                handleOption();;
+                                handleOption();
                             }}
                         >
                             <View style={styles.flex_row}>
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ContextModal;
+export default PrescriptionContextModal;

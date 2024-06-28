@@ -1,46 +1,116 @@
 import * as React from "react";
-import { FlatList, Image, StyleSheet, Text, TextInput, View, Pressable, TouchableOpacity } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TextInput, View, Pressable, TouchableOpacity, ActivityIndicator } from 'react-native';
 import draftDoc from "../testdata/draft-data";
 import PatientModal from "./modals/PatientModal";
 import { useNavigation } from "@react-navigation/native";
 import ContextModal from "./modals/ContextModal";
 import { apiService } from "../src/services/api-service";
+import { USER_ID, USER_TOKEN } from "./Signin";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Patientdashboard = () => {
+const Patientdashboard = ({ route }) => {
   const [selectedOption, setSelectedOption] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState(null);
-  const [allPatient, setAllPatient]= React.useState([]);
+  const [allPatient, setAllPatient] = React.useState([]);
+  const [isDeleteSuccess, setIsDeleteSuccess] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [totalMalePatients, setTotalMalePatients] = React.useState('')
+  const [totalFemalePatients, setTotalFemalePatients] = React.useState('')
 
-const navigation = useNavigation();
+  const navigation = useNavigation();
   const closeModal = () => {
-      setSelectedOption('');
-      setModalVisible(false);
+    setSelectedOption('');
+    setModalVisible(false);
   };
 
   const handleOption = (item) => {
-      setSelectedItem(item);
-      setModalVisible(!modalVisible);
+    setSelectedItem(item);
+    setModalVisible(!modalVisible);
   };
 
   const confirmDelete = () => {
-      // Perform deletion logic here
-      setModalVisible(false);
-      console.log(`Deleting item: ${selectedItem.name}`);
+    // Perform deletion logic here
+    setModalVisible(false);
+    console.log(`Deleting item: ${selectedItem.name}`);
   };
 
-  React.useEffect(()=>{
-    apiService.getAllPatient().then((res)=>{
-      const data = res.data.map(item=>{return {id: item._id, ...item}})
-      setAllPatient(data)
-    })
-  },[])
+  React.useEffect(() => {
 
-  const draftItem = (data) => {
+    setLoading(true)
+    loadPatient();
+    getTotalFemalePatient();
+    getTotalMalePatient();
+  }, [isDeleteSuccess]);
+
+
+  const loadPatient = async () => {
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+    await apiService.getAllPatient(token).then((res) => {
+      const data = res.data.patients.map(item => { return { id: item._id, ...item } });
+      setAllPatient(data);
+      setLoading(false)
+    }).catch((err) => {
+      setLoading(false);
+      console.log("patient dashboard data loading :", err);
+    });
+  }
+  const getTotalMalePatient = async () => {
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+
+    await apiService.getAllMalePatient(token)
+      .then(response => {
+        let patientCount = response.data.data.totalMale
+        setTotalMalePatients(patientCount);
+        setLoading(false)
+      })
+      .catch(error => {
+        console.error('Error at totall male patient get request:', error.response.data);
+        setLoading(false);
+      });
+
+  }
+
+  const getTotalFemalePatient = async () => {
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+
+    await apiService.getAllFemalePatient(token)
+      .then(response => {
+        let patientCount = response.data.data.totalFemale
+        setTotalFemalePatients(patientCount);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error at totall male patient get request:', error.response.data);
+        setLoading(false);
+      });
+
+  }
+
+  const deletePatientHandler = async (id) => {
+    setLoading(true);
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+    await apiService.deletePatient(id, token).then(() => {
+      setIsDeleteSuccess(true);
+      setLoading(false)
+    }).catch(err => {
+      setLoading(false);
+      console.log("error occur while deleting patient", err.response.data);
+    })
+  }
+
+  const patientItem = (data) => {
     const { item } = data;
+    // console.log("patient at patient dashboard", item.image)
     return (
-      <Pressable style={styles.item} onPress={()=> navigation.navigate('patient',{item})} >
-        <Image source={{ uri: 'https://randomuser.me/api/portraits/women/1.jpg' }} style={styles.avatar} />
+      <Pressable style={styles.item} onPress={() => navigation.navigate('patient', { item })} >
+        {
+          item.image.length > 20 ? (
+            <Image source={{ uri: item.image }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatar} />
+          )
+        }
         <View style={styles.infoContainer}>
           <View style={styles.dateTime}>
             <Text style={styles.dateTimeText}>{item?.dateOfBirth}</Text>
@@ -52,7 +122,7 @@ const navigation = useNavigation();
             <Text>{item.phone}</Text>
           </View>
         </View>
-        <ContextModal item={item} />
+        <ContextModal item={item} deletePatientHandler={deletePatientHandler} />
       </Pressable>
     )
   }
@@ -70,17 +140,17 @@ const navigation = useNavigation();
         <View style={styles.overview}>
           <View style={styles.overview1}>
             <Image source={require('../assets/dashboard/man.png')} style={styles.men} />
-            <Text style={styles.num}>0</Text>
+            <Text style={styles.num}>{allPatient.length}</Text>
             <Text style={styles.txt}>Total Patient </Text>
           </View>
           <View style={styles.overview2}>
             <Image source={require('../assets/dashboard/male.png')} style={styles.men} />
-            <Text style={styles.num}>0</Text>
+            <Text style={styles.num}>{totalMalePatients}</Text>
             <Text style={styles.txt1}> Male </Text>
           </View>
           <View style={styles.overview3}>
             <Image source={require('../assets/dashboard/female.png')} style={styles.men} />
-            <Text style={styles.num}>0</Text>
+            <Text style={styles.num}>{totalFemalePatients}</Text>
             <Text style={styles.txt2}> Female </Text>
           </View>
         </View>
@@ -101,13 +171,20 @@ const navigation = useNavigation();
         </View>
       </View>
 
-      <FlatList
-        style={{ flex: 1 }}
-        data={allPatient}
-        renderItem={draftItem}
-        keyExtractor={(item, index) => index.toString()}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator color={'blue'} size={'large'} />
+        </View>
+      ) : (
+        <FlatList
+          style={{ flex: 1 }}
+          data={allPatient}
+          renderItem={patientItem}
+          keyExtractor={(item, index) => index.toString()}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ListFooterComponent={() => <View style={{ height: 100 }} />}
+        />
+      )}
 
     </View>
 
@@ -116,7 +193,8 @@ const navigation = useNavigation();
 
 
   </>
-  )};
+  )
+};
 
 const styles = StyleSheet.create({
 
@@ -303,7 +381,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     elevation: 4,
     backgroundColor: '#E3FFEF',
-    color: ' #192608',
+    color: '#192608',
     fontSize: 14,
 
     left: 5,

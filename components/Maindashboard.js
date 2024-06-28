@@ -7,11 +7,85 @@ import {
   Text,
   TouchableOpacity, View,
 } from "react-native";
-
-
-
+import { apiService } from "../src/services/api-service";
+import { USER_ID, USER_TOKEN } from "./Signin";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const Maindashboard = (props) => {
+
+  const [doctorInfo, setDoctorInfo] = React.useState({})
+  const [totalPatients, setTotalPatients] = React.useState('')
+  const [totalMalePatients, setTotalMalePatients] = React.useState('')
+  const [totalFemalePatients, setTotalFemalePatients] = React.useState('')
+
+  React.useEffect(() => {
+
+    getDoc();
+    getTotalPatient();
+    getTotalMalePatient();
+    getTotalFemalePatient();
+
+  }, []);
+
+
+  const getDoc = async () => {
+    const id = await AsyncStorage.getItem(USER_ID);
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+
+    await apiService.getDoctor(token).then((res) => {
+      setDoctorInfo(res.data)
+    }).catch(err => console.log("get doctor fail:", err.response.data))
+
+  }
+
+  const getTotalPatient = async () => {
+
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+
+    // await axios.get(`${baseUrl}api/patients`, {
+    //   headers: { token }
+    // })
+    await apiService.getAllPatient(token)
+      .then(response => {
+        let patientCount = response.data.patients?.length
+        setTotalPatients(patientCount);
+      })
+      .catch(error => {
+        console.error('Error making GET totall patinet request rrrr:', error.response.data);
+      });
+
+  }
+
+  const getTotalMalePatient = async () => {
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+
+    // await axios.get(`${baseUrl}api/patients/male`, { headers: { token } })
+    await apiService.getAllMalePatient(token)
+      .then(response => {
+        let patientCount = response.data.data.totalMale
+        setTotalMalePatients(patientCount)
+      })
+      .catch(error => {
+        console.error('Error at totall male patient get request:', error.response.data);
+      });
+
+  }
+
+  const getTotalFemalePatient = async () => {
+    const token = await AsyncStorage.getItem(USER_TOKEN);
+
+    // await axios.get(`${baseUrl}api/patients/female`, { headers: { token } })
+    await apiService.getAllFemalePatient(token)
+      .then(response => {
+        let patientCount = response.data.data.totalFemale
+        setTotalFemalePatients(patientCount)
+      })
+      .catch(error => {
+        console.error('Error at totall male patient get request:', error.response.data);
+      });
+
+  }
 
   return (
     <>
@@ -20,16 +94,21 @@ const Maindashboard = (props) => {
 
           <View style={styles.profile}>
             <TouchableOpacity onPress={() => props.navigation.navigate("drprofile")}>
-              <Image source={require('../assets/social/doctor.png')} style={styles.imge} />
+              {doctorInfo?.doctor?.image.length > 20 ? (
+                <Image source={{ uri: doctorInfo?.doctor?.image }} style={styles.imge} />
+              ) : (
+                <Image source={require('../assets/social/doctor.png')} style={styles.imge} />
+
+              )}
             </TouchableOpacity>
 
             <View style={styles.drinfo}>
               <Text style={styles.prtxt}> Welcome back, </Text>
               <View style={styles.verified}>
-                <Text style={styles.dctr}>Dr. Ariful Haque </Text>
+                <Text style={styles.dctr}>{doctorInfo?.user?.fullName}</Text>
                 <Image source={require('../assets/dashboard/check.png')} style={styles.icon} />
               </View>
-              <Text style={styles.titl}> B.H.M.S, DU</Text>
+              <Text style={styles.titl}>{doctorInfo?.doctor?.medicalName}</Text>
 
 
             </View>
@@ -54,17 +133,17 @@ const Maindashboard = (props) => {
           <View style={styles.overview}>
             <View style={styles.overview1}>
               <Image source={require('../assets/dashboard/man.png')} style={styles.men} />
-              <Text style={styles.num}>0</Text>
+              <Text style={styles.num}>{totalPatients}</Text>
               <Text style={styles.txt}>Total Patient </Text>
             </View>
             <View style={styles.overview2}>
               <Image source={require('../assets/dashboard/male.png')} style={styles.men} />
-              <Text style={styles.num}>0</Text>
+              <Text style={styles.num}>{totalMalePatients}</Text>
               <Text style={styles.txt1}> Male </Text>
             </View>
             <View style={styles.overview3}>
               <Image source={require('../assets/dashboard/female.png')} style={styles.men} />
-              <Text style={styles.num}>0</Text>
+              <Text style={styles.num}>{totalFemalePatients}</Text>
               <Text style={styles.txt2}> Female </Text>
             </View>
           </View>
@@ -129,7 +208,7 @@ const Maindashboard = (props) => {
             </View>
 
             <View>
-              <TouchableOpacity onPress={() => props.navigation.navigate("editprofile")}>
+              <TouchableOpacity onPress={() => props.navigation.navigate("editprofile",{doctorInfo})}>
                 <Image source={require('../assets/dashboard/profile.png')} style={styles.btnavbar} />
               </TouchableOpacity>
             </View>
